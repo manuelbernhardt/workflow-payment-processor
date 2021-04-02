@@ -2,12 +2,14 @@ package io.bernhardt.workflow.payment
 
 import io.bernhardt.workflow.payment.converter.ExtendedConverter
 import io.bernhardt.workflow.payment.creditcard.CreditCardDetails
+import io.bernhardt.workflow.payment.creditcard.IssuerBankClient
 import io.bernhardt.workflow.payment.creditcard.IssuerCardId
-import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingActivityImpl
+import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingActivitiesImpl
 import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingWorkflowImpl
 import io.bernhardt.workflow.payment.creditcard.impl.MemoryCreditCardStorage
+import io.bernhardt.workflow.payment.creditcard.impl.RandomLatencyIssuerBankClient
 import io.bernhardt.workflow.payment.impl.MemoryConfigurationServiceImpl
-import io.bernhardt.workflow.payment.impl.PaymentHandlingActivityImpl
+import io.bernhardt.workflow.payment.impl.PaymentHandlingActivitiesImpl
 import io.bernhardt.workflow.payment.impl.PaymentHandlingWorkflowImpl
 import io.temporal.client.WorkflowClient
 import io.temporal.client.WorkflowClientOptions
@@ -15,7 +17,8 @@ import io.temporal.client.WorkflowOptions
 import io.temporal.common.converter.DefaultDataConverter
 import io.temporal.serviceclient.WorkflowServiceStubs
 import io.temporal.worker.WorkerFactory
-import javax.money.Monetary
+import java.time.Duration
+import java.util.*
 import kotlin.system.exitProcess
 
 fun main() {
@@ -33,6 +36,9 @@ fun main() {
     configurationService.storeMerchantConfiguration(merchantId, MerchantConfiguration(merchantId, BankIdentifier("bankA")))
     configurationService.storeUserConfiguration(userId, UserConfiguration(CreditCard(creditCardId)))
     val creditCardStorage = MemoryCreditCardStorage()
+    val spendingLimit = 1000000
+    val issuerBankClient: IssuerBankClient = RandomLatencyIssuerBankClient(spendingLimit, Duration.ofMillis(0), Duration.ofMillis(0))
+
     creditCardStorage.storeCreditCard(creditCardId, CreditCardDetails(creditCardId, userId, "1234", BankIdentifier("bankB"), IssuerCardId("foo")))
 
     // gRPC stubs wrapper that talks to the local docker instance of temporal service.
@@ -51,20 +57,21 @@ fun main() {
     // Worker that listens on a task queue and hosts both workflow and activity implementations.
     val worker = factory.newWorker(TASK_QUEUE)
     worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl::class.java, CreditCardProcessingWorkflowImpl::class.java)
-    worker.registerActivitiesImplementations(PaymentHandlingActivityImpl(configurationService), CreditCardProcessingActivityImpl(creditCardStorage))
+    worker.registerActivitiesImplementations(PaymentHandlingActivitiesImpl(configurationService), CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient))
 
     // Start listening to the workflow task queue.
     factory.start()
 
-    // Start a workflow execution. Usually this is done from another program.
-    // Uses task queue from the GreetingWorkflow @WorkflowMethod annotation.
-    val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build())
-
     // Execute a workflow waiting for it to complete.
-    val amount = Monetary.getDefaultAmountFactory().setCurrency("USD").setNumber(21).create()
-    val paymentResult = workflow.handlePayment(OrderId("helloWorld"), amount, merchantId, userId)
-
-    println(paymentResult)
+    for (i in 0..30) {
+        // Start a workflow execution. Usually this is done from another program.
+        // Uses task queue from the GreetingWorkflow @WorkflowMethod annotation.
+        val start = System.currentTimeMillis()
+        val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build())
+        val paymentResult = workflow.handlePayment(OrderId("helloWorld-${UUID.randomUUID()}"), 21, merchantId, userId)
+        println(System.currentTimeMillis() - start)
+        println(paymentResult)
+    }
 
     exitProcess(0)
 }

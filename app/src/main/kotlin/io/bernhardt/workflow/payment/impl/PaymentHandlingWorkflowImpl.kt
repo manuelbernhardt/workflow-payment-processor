@@ -4,7 +4,6 @@ import io.bernhardt.workflow.payment.*
 import io.bernhardt.workflow.payment.creditcard.CreditCardPaymentFailure
 import io.bernhardt.workflow.payment.creditcard.CreditCardPaymentSuccess
 import io.bernhardt.workflow.payment.creditcard.CreditCardProcessingWorkflow
-import javax.money.MonetaryAmount
 import io.temporal.workflow.Workflow
 import io.temporal.activity.ActivityOptions
 import java.time.Duration
@@ -17,7 +16,7 @@ class PaymentHandlingWorkflowImpl: PaymentHandlingWorkflow {
 
     private val paymentHandling: PaymentHandlingActivity = Workflow.newActivityStub(PaymentHandlingActivity::class.java, options)
 
-    override fun handlePayment(orderId: OrderId, amount: MonetaryAmount, merchantId: MerchantId, userId: UserId): PaymentResult {
+    override fun handlePayment(orderId: OrderId, amount: Int, merchantId: MerchantId, userId: UserId): PaymentResult {
         val paymentConfiguration = paymentHandling.retrieveConfiguration(merchantId, userId)
 
         paymentConfiguration?.let { config ->

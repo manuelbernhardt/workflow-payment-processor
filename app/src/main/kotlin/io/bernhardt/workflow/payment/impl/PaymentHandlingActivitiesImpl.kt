@@ -1,9 +1,11 @@
 package io.bernhardt.workflow.payment.impl
 
 import io.bernhardt.workflow.payment.*
-import javax.money.MonetaryAmount
+import org.slf4j.LoggerFactory
 
-class PaymentHandlingActivityImpl(private val configurationService: ConfigurationService): PaymentHandlingActivity {
+class PaymentHandlingActivitiesImpl(private val configurationService: ConfigurationService): PaymentHandlingActivity {
+
+    val logger = LoggerFactory.getLogger(PaymentHandlingActivitiesImpl::class.java)
 
     override fun retrieveConfiguration(merchantId: MerchantId, userId: UserId): PaymentConfiguration {
         val merchantConfiguration = configurationService.retrieveMerchantConfiguration(merchantId)
@@ -15,8 +17,8 @@ class PaymentHandlingActivityImpl(private val configurationService: Configuratio
         return PaymentConfiguration(merchantConfiguration, userConfiguration)
     }
 
-    override fun dispatchForSettlement(transactionId: TransactionId, merchantId: MerchantId, userId: UserId, amount: MonetaryAmount) {
+    override fun dispatchForSettlement(transactionId: TransactionId, merchantId: MerchantId, userId: UserId, amount: Int) {
         // this would usually go to a message bus of sorts
-        println("Settlement: transactionId:$transactionId amount:$amount merchantId:$merchantId userId:$userId")
+        logger.debug("Settlement: transactionId:$transactionId amount:$amount merchantId:$merchantId userId:$userId")
     }
 }

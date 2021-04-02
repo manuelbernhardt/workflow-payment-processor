@@ -12,6 +12,8 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+
+    id("me.champeau.jmh") version "0.6.3"
 }
 
 repositories {
@@ -32,14 +34,9 @@ dependencies {
     // Here is the temporal SDK
     implementation("io.temporal:temporal-sdk:1.0.0")
 
-    // Java Money API
-    implementation("javax.money:money-api:1.1")
-    implementation("org.javamoney.moneta:moneta-core:1.4.2")
-
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2")
-    implementation("org.zalando:jackson-datatype-money:1.2.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.0")
 
     // Logging
@@ -68,4 +65,11 @@ kotlin {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "14"
+}
+
+jmh {
+    iterations.set(5)
+    warmupForks.set(1   )
+    fork.set(2)
+
 }

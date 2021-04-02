@@ -5,25 +5,26 @@ import io.bernhardt.workflow.payment.OrderId
 import io.bernhardt.workflow.payment.creditcard.*
 import java.time.Duration
 import java.util.*
-import javax.money.MonetaryAmount
 import kotlin.math.abs
 
 /**
  * Mock client that authorizes expenses until a given amount has been reached.
  * Results are returned within a given latency boundary.
  */
-class RandomLatencyIssuerBankClient(private val maxExpenses: MonetaryAmount, private val min: Duration, private val max: Duration): IssuerBankClient {
+class RandomLatencyIssuerBankClient(private val spendingLimit: Int, private val min: Duration, private val max: Duration): IssuerBankClient {
 
-    private val expenses = mutableMapOf<CreditCardId, MonetaryAmount>()
+    private val expenses = mutableMapOf<CreditCardId, Int>()
 
-    override fun authorize(id: CreditCardId, amount: MonetaryAmount, orderId: OrderId): AuthorizationResult {
+    override fun authorize(id: CreditCardId, amount: Int, orderId: OrderId): AuthorizationResult {
         if(!expenses.containsKey(id)) {
-            expenses[id] = maxExpenses
+            expenses[id] = spendingLimit
         }
 
-        return if(expenses[id]!!.isGreaterThan(amount)) {
-            expenses[id] = expenses[id]!!.subtract(amount)
-            waitRandom()
+        return if(expenses[id]!! > amount) {
+            expenses[id] = expenses[id]!! - amount
+            if (max.toMillis() > 0) {
+                waitRandom()
+            }
             val authorizationId = AuthorizationId("auth-${abs((orderId.id + id.id).hashCode())}")
             AuthorizationSuccess(authorizationId)
         } else {
@@ -32,9 +33,11 @@ class RandomLatencyIssuerBankClient(private val maxExpenses: MonetaryAmount, pri
 
     }
 
-    override fun capture(id: AuthorizationId): CaptureResult {
-        waitRandom()
-        val captureId = CaptureId("capture-${abs((id.id).hashCode())}")
+    override fun capture(id: AuthorizationId, orderId: OrderId): CaptureResult {
+        if (max.toMillis() > 0) {
+            waitRandom()
+        }
+        val captureId = CaptureId("capture-${abs((orderId.id + id.id).hashCode())}")
         return CaptureSuccess(captureId)
     }
 

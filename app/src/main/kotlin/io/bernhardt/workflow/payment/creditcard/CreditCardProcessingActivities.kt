@@ -1,13 +1,10 @@
 package io.bernhardt.workflow.payment.creditcard
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.bernhardt.workflow.payment.BankIdentifier
-import io.bernhardt.workflow.payment.CreditCardId
-import io.bernhardt.workflow.payment.OrderId
-import io.bernhardt.workflow.payment.UserId
+import io.bernhardt.workflow.payment.*
 import io.temporal.activity.ActivityInterface
 import io.temporal.activity.ActivityMethod
-import javax.money.MonetaryAmount
 
 @ActivityInterface
 interface CreditCardProcessingActivity {
@@ -22,13 +19,13 @@ interface CreditCardProcessingActivity {
      * Authorizes a credit card payment with the issuer bank
      */
     @ActivityMethod
-    fun authorize(id: CreditCardId, amount: MonetaryAmount, orderId: OrderId): AuthorizationResult
+    fun authorize(id: CreditCardId, amount: Int, orderId: OrderId): AuthorizationResult
 
     /**
      * Captures a credit card payment with the issuer bank
      */
     @ActivityMethod
-    fun capture(authorizationId: AuthorizationId): CaptureResult
+    fun capture(authorizationId: AuthorizationId, orderId: OrderId): CaptureResult
 
 }
 
@@ -37,12 +34,20 @@ data class CreditCardDetails(val id: CreditCardId, val userId: UserId, val last4
 data class IssuerCardId(val id: String)
 data class AuthorizationId(val id: String)
 
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = AuthorizationSuccess::class, name = "AuthorizationSuccess"),
+        JsonSubTypes.Type(value = AuthorizationFailure::class, name = "AuthorizationFailure")
+)
 sealed interface AuthorizationResult
 data class AuthorizationSuccess(val id: AuthorizationId): AuthorizationResult
 data class AuthorizationFailure(val reason: String): AuthorizationResult
 
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = CaptureSuccess::class, name = "CaptureSuccess"),
+        JsonSubTypes.Type(value = CaptureFailure::class, name = "CaptureFailure")
+)
 sealed interface CaptureResult
 data class CaptureSuccess(val captureId: CaptureId): CaptureResult
 data class CaptureFailure(val reason: String): CaptureResult

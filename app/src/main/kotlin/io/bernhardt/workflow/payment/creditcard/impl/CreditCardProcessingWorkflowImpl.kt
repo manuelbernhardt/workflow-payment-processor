@@ -6,7 +6,6 @@ import io.temporal.activity.ActivityOptions
 import io.temporal.common.RetryOptions
 import io.temporal.workflow.Workflow
 import java.time.Duration
-import javax.money.MonetaryAmount
 
 class CreditCardProcessingWorkflowImpl : CreditCardProcessingWorkflow {
 
@@ -26,7 +25,7 @@ class CreditCardProcessingWorkflowImpl : CreditCardProcessingWorkflow {
 
     private val creditCard: CreditCardProcessingActivity = Workflow.newActivityStub(CreditCardProcessingActivity::class.java, options)
 
-    override fun processPayment(orderId: OrderId, amount: MonetaryAmount, merchantConfiguration: MerchantConfiguration, userId: UserId, card: CreditCard): CreditCardPaymentResult {
+    override fun processPayment(orderId: OrderId, amount: Int, merchantConfiguration: MerchantConfiguration, userId: UserId, card: CreditCard): CreditCardPaymentResult {
         val details = creditCard.retrieveCreditCardDetails(card.id)
 
         if (details != null) {
@@ -35,7 +34,7 @@ class CreditCardProcessingWorkflowImpl : CreditCardProcessingWorkflow {
             // (including stable identifiers in case of success)
             return when (val authorization = creditCard.authorize(details.id, amount, orderId)) {
                 is AuthorizationSuccess -> {
-                    when (val capture = creditCard.capture(authorization.id)) {
+                    when (val capture = creditCard.capture(authorization.id, orderId)) {
                         is CaptureSuccess ->
                             // keep capture as an internal detail of credit card payments
                             CreditCardPaymentSuccess(TransactionId(capture.captureId.id))
