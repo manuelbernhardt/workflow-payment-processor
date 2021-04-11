@@ -1,11 +1,12 @@
 package io.bernhardt.workflow.payment.impl
 
 import io.bernhardt.workflow.payment.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PaymentHandlingActivitiesImpl(private val configurationService: ConfigurationService): PaymentHandlingActivity {
+class PaymentHandlingActivitiesImpl(private val configurationService: ConfigurationService): PaymentHandlingActivities {
 
-    val logger = LoggerFactory.getLogger(PaymentHandlingActivitiesImpl::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(PaymentHandlingActivitiesImpl::class.java)
 
     override fun retrieveConfiguration(merchantId: MerchantId, userId: UserId): PaymentConfiguration {
         val merchantConfiguration = configurationService.retrieveMerchantConfiguration(merchantId)

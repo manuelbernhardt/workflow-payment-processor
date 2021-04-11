@@ -17,21 +17,16 @@ public class PaymentHandlingWorkflowBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public PaymentResult runWorkflowAvgExecutionTime(WorkflowSetup setup) {
-        // Start a workflow execution. Usually this is done from another program.
-        // Uses task queue from the GreetingWorkflow @WorkflowMethod annotation.
         PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
-        // Execute a workflow waiting for it to complete.
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    // FIXME this is a stupid benchmark because we only have one worker. so we're measuring single-worker throughput for two workflows (the main one and the credit card one), which is rather meaningless
     public PaymentResult runWorkflowThroughput(WorkflowSetup setup) {
-        // Start a workflow execution. Usually this is done from another program.
-        // Uses task queue from the GreetingWorkflow @WorkflowMethod annotation.
         PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
-        // Execute a workflow waiting for it to complete.
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
 

@@ -41,37 +41,38 @@ fun main() {
 
     creditCardStorage.storeCreditCard(creditCardId, CreditCardDetails(creditCardId, userId, "1234", BankIdentifier("bankB"), IssuerCardId("foo")))
 
-    // gRPC stubs wrapper that talks to the local docker instance of temporal service.
+    // create the gRPC client stubs configured to communicate with the local docker instance of the Temporal server
     val service = WorkflowServiceStubs.newInstance()
 
+    // configure client options
     val clientOpts = WorkflowClientOptions.newBuilder()
+            // use a custom data converter for serialization of Kotlin classes to work correctly
             .setDataConverter(ExtendedConverter())
             .build()
 
-    // client that can be used to start and signal workflows
-    val client = WorkflowClient.newInstance(service, clientOpts)
+   // create a client that can be used to communicate with Temporal to run workflows
+   val client = WorkflowClient.newInstance(service, clientOpts)
 
-    // worker factory that can be used to create workers for specific task queues
+    // create a worker factory that can be used to create workers for specific task queues
     val factory = WorkerFactory.newInstance(client)
 
-    // Worker that listens on a task queue and hosts both workflow and activity implementations.
+    // create a single worker that listens on a task queue and hosts both workflow and activity implementations
+    // this works well for examples, for real workloads it's likely that you'd choose a different deployment model
     val worker = factory.newWorker(TASK_QUEUE)
+
+    // register the workflow implementations
     worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl::class.java, CreditCardProcessingWorkflowImpl::class.java)
+
+    // register the activity implementations
     worker.registerActivitiesImplementations(PaymentHandlingActivitiesImpl(configurationService), CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient))
 
-    // Start listening to the workflow task queue.
+    // start listening to the workflow task queue
     factory.start()
 
-    // Execute a workflow waiting for it to complete.
-    for (i in 0..30) {
-        // Start a workflow execution. Usually this is done from another program.
-        // Uses task queue from the GreetingWorkflow @WorkflowMethod annotation.
-        val start = System.currentTimeMillis()
-        val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build())
-        val paymentResult = workflow.handlePayment(OrderId("helloWorld-${UUID.randomUUID()}"), 21, merchantId, userId)
-        println(System.currentTimeMillis() - start)
-        println(paymentResult)
-    }
+    // run the workflow
+    val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build())
+    val paymentResult = workflow.handlePayment(OrderId("helloWorld-${UUID.randomUUID()}"), 21, merchantId, userId)
+    println(paymentResult)
 
     exitProcess(0)
 }

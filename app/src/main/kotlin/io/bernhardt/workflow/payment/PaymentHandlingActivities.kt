@@ -5,7 +5,7 @@ import io.temporal.activity.ActivityMethod
 
 
 @ActivityInterface
-interface PaymentHandlingActivity {
+interface PaymentHandlingActivities {
 
     @ActivityMethod
     fun retrieveConfiguration(merchantId: MerchantId, userId: UserId): PaymentConfiguration?

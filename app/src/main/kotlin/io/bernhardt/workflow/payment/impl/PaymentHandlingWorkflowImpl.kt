@@ -11,10 +11,10 @@ import java.time.Duration
 class PaymentHandlingWorkflowImpl: PaymentHandlingWorkflow {
 
     private val options = ActivityOptions.newBuilder()
-            .setStartToCloseTimeout(Duration.ofSeconds(2))
+            .setStartToCloseTimeout(Duration.ofSeconds(5))
             .build()
 
-    private val paymentHandling: PaymentHandlingActivity = Workflow.newActivityStub(PaymentHandlingActivity::class.java, options)
+    private val paymentHandling: PaymentHandlingActivities = Workflow.newActivityStub(PaymentHandlingActivities::class.java, options)
 
     override fun handlePayment(orderId: OrderId, amount: Int, merchantId: MerchantId, userId: UserId): PaymentResult {
         val paymentConfiguration = paymentHandling.retrieveConfiguration(merchantId, userId)
