@@ -21,13 +21,13 @@ public class PaymentHandlingWorkflowBenchmark {
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
 
-    @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
     // FIXME this is a stupid benchmark because we only have one worker. so we're measuring single-worker throughput for two workflows (the main one and the credit card one), which is rather meaningless
-    public PaymentResult runWorkflowThroughput(WorkflowSetup setup) {
-        PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
-        return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
-    }
+//    @Benchmark
+//    @BenchmarkMode(Mode.Throughput)
+//    @OutputTimeUnit(TimeUnit.SECONDS)
+//    public PaymentResult runWorkflowThroughput(WorkflowSetup setup) {
+//        PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
+//        return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
+//    }
 
 }
