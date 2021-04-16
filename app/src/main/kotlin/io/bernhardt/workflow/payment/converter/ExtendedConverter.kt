@@ -6,5 +6,6 @@ class ExtendedConverter: DefaultDataConverter(
         NullPayloadConverter(),
         ByteArrayPayloadConverter(),
         ProtobufJsonPayloadConverter(),
-        ExtendedJacksonJsonPayloadConverter()
+        JacksonCborPayloadConverter("binary/cbor"),
+        JacksonCborPayloadConverter("json/plain")
 )
