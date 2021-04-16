@@ -6,15 +6,16 @@ import io.bernhardt.workflow.payment.creditcard.CreditCardPaymentSuccess
 import io.bernhardt.workflow.payment.creditcard.CreditCardProcessingWorkflow
 import io.temporal.workflow.Workflow
 import io.temporal.activity.ActivityOptions
+import io.temporal.activity.LocalActivityOptions
 import java.time.Duration
 
 class PaymentHandlingWorkflowImpl: PaymentHandlingWorkflow {
 
-    private val options = ActivityOptions.newBuilder()
+    private val options = LocalActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofSeconds(5))
             .build()
 
-    private val paymentHandling: PaymentHandlingActivities = Workflow.newActivityStub(PaymentHandlingActivities::class.java, options)
+    private val paymentHandling: PaymentHandlingActivities = Workflow.newLocalActivityStub(PaymentHandlingActivities::class.java, options)
 
     override fun handlePayment(orderId: OrderId, amount: Int, merchantId: MerchantId, userId: UserId): PaymentResult {
         val paymentConfiguration = paymentHandling.retrieveConfiguration(merchantId, userId)

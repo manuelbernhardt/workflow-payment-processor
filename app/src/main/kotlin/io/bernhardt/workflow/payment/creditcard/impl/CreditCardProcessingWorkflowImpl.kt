@@ -3,6 +3,7 @@ package io.bernhardt.workflow.payment.creditcard.impl
 import io.bernhardt.workflow.payment.*
 import io.bernhardt.workflow.payment.creditcard.*
 import io.temporal.activity.ActivityOptions
+import io.temporal.activity.LocalActivityOptions
 import io.temporal.common.RetryOptions
 import io.temporal.workflow.Workflow
 import java.time.Duration
@@ -18,12 +19,12 @@ class CreditCardProcessingWorkflowImpl : CreditCardProcessingWorkflow {
             .setBackoffCoefficient(1.2)
             .build()
 
-    private val options = ActivityOptions.newBuilder()
+    private val options = LocalActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofSeconds(1))
             .setRetryOptions(retryOptions)
             .build()
 
-    private val creditCard: CreditCardProcessingActivity = Workflow.newActivityStub(CreditCardProcessingActivity::class.java, options)
+    private val creditCard: CreditCardProcessingActivity = Workflow.newLocalActivityStub(CreditCardProcessingActivity::class.java, options)
 
     override fun processPayment(orderId: OrderId, amount: Int, merchantConfiguration: MerchantConfiguration, userId: UserId, card: CreditCard): CreditCardPaymentResult {
         val details = creditCard.retrieveCreditCardDetails(card.id)
