@@ -12,8 +12,6 @@ import org.openjdk.jmh.annotations.Warmup;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static io.bernhardt.workflow.payment.WorkflowSetup.TASK_QUEUE;
-
 public class PaymentHandlingWorkflowBenchmark {
 
     @Benchmark
@@ -23,7 +21,7 @@ public class PaymentHandlingWorkflowBenchmark {
     @Measurement(iterations = 10, time = 10)
     @Fork(value = 1, warmups = 0)
     public PaymentResult runWorkflowAvgExecutionTime(WorkflowSetup setup) {
-        PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
+        PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(Shared.COMMON_TASK_QUEUE).build());
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
 

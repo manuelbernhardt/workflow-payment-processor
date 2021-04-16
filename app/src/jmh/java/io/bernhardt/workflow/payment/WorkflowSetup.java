@@ -30,7 +30,8 @@ import java.time.Duration;
 @State(Scope.Benchmark)
 public class WorkflowSetup {
 
-    static String TASK_QUEUE = "PaymentHandling";
+    protected boolean useDedicatedTaskQueues = Shared.useDedicatedQueues;
+
     MerchantId merchantId = new MerchantId("merchantA");
     UserId userId = new UserId("john");
     CreditCardId creditCardId = new CreditCardId("42");
@@ -39,6 +40,7 @@ public class WorkflowSetup {
 
     WorkerFactory factory = null;
     Worker worker = null;
+    Worker worker2 = null;
     WorkflowClient client = null;
 
     @Setup(Level.Trial)
@@ -71,10 +73,22 @@ public class WorkflowSetup {
         // worker factory that can be used to create workers for specific task queues
         this.factory = WorkerFactory.newInstance(client, factoryOptions);
 
-        // Worker that listens on a task queue and hosts both workflow and activity implementations.
-        worker = factory.newWorker(TASK_QUEUE);
-        worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
-        worker.registerActivitiesImplementations(new PaymentHandlingActivitiesImpl(configurationService), new CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient));
+        if (useDedicatedTaskQueues) {
+            worker = factory.newWorker(Shared.PAYMENT_TASK_QUEUE);
+            worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
+            worker.registerActivitiesImplementations(new PaymentHandlingActivitiesImpl(configurationService));
+
+            worker2 = factory.newWorker(Shared.CC_TASK_QUEUE);
+            worker2.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
+            worker.registerActivitiesImplementations(new CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient));
+        } else {
+            worker = factory.newWorker(Shared.COMMON_TASK_QUEUE);
+            worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
+            worker.registerActivitiesImplementations(new PaymentHandlingActivitiesImpl(configurationService), new CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient));
+            worker2 = factory.newWorker(Shared.COMMON_TASK_QUEUE);
+            worker2.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
+            worker2.registerActivitiesImplementations(new PaymentHandlingActivitiesImpl(configurationService), new CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient));
+        }
 
         // Start listening to the workflow task queue.
         factory.start();
@@ -84,7 +98,7 @@ public class WorkflowSetup {
 
     @TearDown(Level.Trial)
     public void tearDown() {
-        // these
+        // this doesn't work, something (probably a thread pool) is preventing clean shutdown
         factory.shutdownNow();
         try {
             Method shutdownNow = Worker.class.getDeclaredMethod("shutdownNow");

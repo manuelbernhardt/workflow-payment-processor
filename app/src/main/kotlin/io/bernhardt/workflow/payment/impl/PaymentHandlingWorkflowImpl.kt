@@ -8,7 +8,7 @@ import io.temporal.activity.LocalActivityOptions
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = false): PaymentHandlingWorkflow {
+class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = false, useSeparateTaskQueues: Boolean = Shared.useDedicatedQueues): PaymentHandlingWorkflow {
 
     private val logger = LoggerFactory.getLogger(PaymentHandlingWorkflowImpl::class.java)
 
@@ -23,11 +23,17 @@ class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = false): PaymentH
     private val paymentHandling: PaymentHandlingActivities = if (useLocalActivities) {
         Workflow.newLocalActivityStub(PaymentHandlingActivities::class.java, localOptions)
     } else {
+        val options = if (useSeparateTaskQueues) {
+            ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(5)).setTaskQueue(Shared.PAYMENT_TASK_QUEUE).build()
+        } else options
         Workflow.newActivityStub(PaymentHandlingActivities::class.java, options)
     }
     private val creditCard: CreditCardProcessingActivity = if(useLocalActivities) {
         Workflow.newLocalActivityStub(CreditCardProcessingActivity::class.java, localOptions)
     } else {
+        val options = if (useSeparateTaskQueues) {
+            ActivityOptions.newBuilder().setStartToCloseTimeout(Duration.ofSeconds(5)).setTaskQueue(Shared.CC_TASK_QUEUE).build()
+        } else options
         Workflow.newActivityStub(CreditCardProcessingActivity::class.java, options)
     }
 

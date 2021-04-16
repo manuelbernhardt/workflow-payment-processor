@@ -28,7 +28,7 @@ fun main() {
     val userId = UserId("john")
 
     // run the workflow
-    val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(App.TASK_QUEUE).build())
+    val workflow = client.newWorkflowStub(PaymentHandlingWorkflow::class.java, WorkflowOptions.newBuilder().setTaskQueue(Shared.COMMON_TASK_QUEUE).build())
     val paymentResult = workflow.handlePayment(OrderId("helloWorld-${UUID.randomUUID()}"), 21, merchantId, userId)
     println(paymentResult)
 
@@ -39,10 +39,6 @@ class App {
 
     val client: WorkflowClient
     val factory: WorkerFactory
-
-    companion object {
-        val TASK_QUEUE = "PaymentHandling"
-    }
 
     init {
 
@@ -81,7 +77,7 @@ class App {
 
         // create a single worker that listens on a task queue and hosts both workflow and activity implementations
         // this works well for examples, for real workloads it's likely that you'd choose a different deployment model
-        val worker = factory.newWorker(TASK_QUEUE)
+        val worker = factory.newWorker(Shared.COMMON_TASK_QUEUE)
 
         // register the workflow implementations
         worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl::class.java)
