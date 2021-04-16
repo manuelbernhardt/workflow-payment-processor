@@ -2,26 +2,44 @@ package io.bernhardt.workflow.payment.impl
 
 import io.bernhardt.workflow.payment.creditcard.*
 import io.bernhardt.workflow.payment.*
+import io.temporal.activity.ActivityOptions
 import io.temporal.workflow.Workflow
 import io.temporal.activity.LocalActivityOptions
+import org.slf4j.LoggerFactory
 import java.time.Duration
 
-class PaymentHandlingWorkflowImpl: PaymentHandlingWorkflow {
+class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = false): PaymentHandlingWorkflow {
 
-    private val options = LocalActivityOptions.newBuilder()
+    private val logger = LoggerFactory.getLogger(PaymentHandlingWorkflowImpl::class.java)
+
+    private val localOptions = LocalActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofSeconds(5))
             .build()
 
-    private val paymentHandling: PaymentHandlingActivities = Workflow.newLocalActivityStub(PaymentHandlingActivities::class.java, options)
-    private val creditCard: CreditCardProcessingActivity = Workflow.newLocalActivityStub(CreditCardProcessingActivity::class.java, options)
+    private val options = ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofSeconds(5))
+            .build()
+
+    private val paymentHandling: PaymentHandlingActivities = if (useLocalActivities) {
+        Workflow.newLocalActivityStub(PaymentHandlingActivities::class.java, localOptions)
+    } else {
+        Workflow.newActivityStub(PaymentHandlingActivities::class.java, options)
+    }
+    private val creditCard: CreditCardProcessingActivity = if(useLocalActivities) {
+        Workflow.newLocalActivityStub(CreditCardProcessingActivity::class.java, localOptions)
+    } else {
+        Workflow.newActivityStub(CreditCardProcessingActivity::class.java, options)
+    }
 
     override fun handlePayment(orderId: OrderId, amount: Int, merchantId: MerchantId, userId: UserId): PaymentResult {
+        logger.info("Handling new payment for $orderId")
         val paymentConfiguration = paymentHandling.retrieveConfiguration(merchantId, userId)
 
         paymentConfiguration?.let { config ->
             when(val method = config.userConfiguration.paymentMethod) {
                 is CreditCard -> {
                     val result = processCreditCardPayment(orderId, amount, config.merchantConfiguration, userId, method)
+                    logger.info("Credit Card processing result $result")
 
                     return when(result) {
                         is CreditCardPaymentSuccess -> {

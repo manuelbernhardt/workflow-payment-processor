@@ -17,6 +17,7 @@ import io.temporal.common.converter.DefaultDataConverter;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
+import io.temporal.worker.WorkerFactoryOptions;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -65,8 +66,10 @@ public class WorkflowSetup {
         // client that can be used to start and signal workflows
         WorkflowClient client = WorkflowClient.newInstance(service, clientOpts);
 
+        WorkerFactoryOptions factoryOptions = WorkerFactoryOptions.newBuilder().setWorkflowHostLocalPollThreadCount(5).build();
+
         // worker factory that can be used to create workers for specific task queues
-        this.factory = WorkerFactory.newInstance(client);
+        this.factory = WorkerFactory.newInstance(client, factoryOptions);
 
         // Worker that listens on a task queue and hosts both workflow and activity implementations.
         worker = factory.newWorker(TASK_QUEUE);
@@ -81,6 +84,7 @@ public class WorkflowSetup {
 
     @TearDown(Level.Trial)
     public void tearDown() {
+        // these
         factory.shutdownNow();
         try {
             Method shutdownNow = Worker.class.getDeclaredMethod("shutdownNow");

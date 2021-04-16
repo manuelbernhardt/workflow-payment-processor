@@ -13,8 +13,12 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+
     id("me.champeau.jmh") version "0.6.3"
 }
+
+project.setProperty("mainClassName", "io.bernhardt.workflow.payment.WorkerKt")
 
 repositories {
     // Use JCenter for resolving dependencies.
@@ -41,7 +45,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.0")
 
     // Logging
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("ch.qos.logback:logback-core:1.2.3")
 
     // Use the Kotlin test library.
@@ -53,7 +57,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("io.bernhardt.temporal.payment.AppKt")
+    mainClass.set("io.bernhardt.workflow.payment.AppKt")
 }
 
 kotlin {
