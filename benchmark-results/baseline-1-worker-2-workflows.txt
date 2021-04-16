@@ -1,0 +1,10 @@
+Benchmark                                                                                           Mode  Cnt    Score    Error  Units
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime                                      sample  345  293.680 ± 15.370  ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.00    sample       236.454           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.50    sample       262.406           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.90    sample       414.083           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.95    sample       485.333           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.99    sample       721.190           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.999   sample       752.878           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p0.9999  sample       752.878           ms/op
+PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime:runWorkflowAvgExecutionTime·p1.00    sample       752.878           ms/op

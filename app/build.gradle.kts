@@ -8,7 +8,7 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.4.31"
+    id("org.jetbrains.kotlin.jvm") version "1.5.0-RC"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -38,6 +38,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.0")
 
     // Logging
     implementation("org.slf4j:slf4j-api:1.7.30")
@@ -68,8 +69,5 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 jmh {
-    iterations.set(5)
-    warmupForks.set(1   )
-    fork.set(2)
 
 }

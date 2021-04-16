@@ -22,7 +22,9 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 
 @State(Scope.Benchmark)
@@ -35,12 +37,12 @@ public class WorkflowSetup {
 
     Integer amountToSpend = 21;
 
+    WorkerFactory factory = null;
     Worker worker = null;
     WorkflowClient client = null;
 
     @Setup(Level.Trial)
     public void setupWorkflowClient() {
-        System.out.println("Setup");
         // force using our extended converter
         DefaultDataConverter.setDefaultDataConverter(new ExtendedConverter());
 
@@ -65,7 +67,7 @@ public class WorkflowSetup {
         WorkflowClient client = WorkflowClient.newInstance(service, clientOpts);
 
         // worker factory that can be used to create workers for specific task queues
-        WorkerFactory factory = WorkerFactory.newInstance(client);
+        this.factory = WorkerFactory.newInstance(client);
 
         // Worker that listens on a task queue and hosts both workflow and activity implementations.
         worker = factory.newWorker(TASK_QUEUE);
@@ -76,6 +78,19 @@ public class WorkflowSetup {
         factory.start();
 
         this.client = client;
+    }
+
+    @TearDown(Level.Trial)
+    public void tearDown() {
+        factory.shutdownNow();
+        try {
+            Method shutdownNow = Worker.class.getDeclaredMethod("shutdownNow");
+            shutdownNow.setAccessible(true);
+            shutdownNow.invoke(worker);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

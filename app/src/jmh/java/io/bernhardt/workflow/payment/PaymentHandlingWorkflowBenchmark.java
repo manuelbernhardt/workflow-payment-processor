@@ -3,8 +3,11 @@ package io.bernhardt.workflow.payment;
 import io.temporal.client.WorkflowOptions;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -14,20 +17,14 @@ import static io.bernhardt.workflow.payment.WorkflowSetup.TASK_QUEUE;
 public class PaymentHandlingWorkflowBenchmark {
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
+    @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    @Warmup(iterations = 1)
+    @Measurement(iterations = 10, time = 10)
+    @Fork(value = 1, warmups = 0)
     public PaymentResult runWorkflowAvgExecutionTime(WorkflowSetup setup) {
         PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
-
-    // FIXME this is a stupid benchmark because we only have one worker. so we're measuring single-worker throughput for two workflows (the main one and the credit card one), which is rather meaningless
-//    @Benchmark
-//    @BenchmarkMode(Mode.Throughput)
-//    @OutputTimeUnit(TimeUnit.SECONDS)
-//    public PaymentResult runWorkflowThroughput(WorkflowSetup setup) {
-//        PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(TASK_QUEUE).build());
-//        return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
-//    }
 
 }
