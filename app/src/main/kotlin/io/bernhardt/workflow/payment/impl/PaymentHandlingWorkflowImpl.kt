@@ -8,7 +8,7 @@ import io.temporal.activity.LocalActivityOptions
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = false, useSeparateTaskQueues: Boolean = Shared.useDedicatedQueues): PaymentHandlingWorkflow {
+class PaymentHandlingWorkflowImpl(useLocalActivities: Boolean = Shared.useLocalActivities, useSeparateTaskQueues: Boolean = Shared.useDedicatedQueues): PaymentHandlingWorkflow {
 
     private val logger = LoggerFactory.getLogger(PaymentHandlingWorkflowImpl::class.java)
 
