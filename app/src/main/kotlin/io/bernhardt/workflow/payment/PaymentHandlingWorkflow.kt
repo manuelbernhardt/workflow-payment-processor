@@ -27,3 +27,12 @@ data class MerchantId(val id: String)
 data class UserId(val id: String)
 data class BankIdentifier(val id: String)
 data class TransactionId(val id: String)
+
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.PROPERTY, property="type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = CreditCardPaymentSuccess::class, name = "CreditCardPaymentSuccess"),
+    JsonSubTypes.Type(value = CreditCardPaymentFailure::class, name = "CreditCardPaymentFailure")
+)
+sealed interface CreditCardPaymentResult
+data class CreditCardPaymentSuccess(val transactionId: TransactionId): CreditCardPaymentResult
+data class CreditCardPaymentFailure(val reason: String): CreditCardPaymentResult

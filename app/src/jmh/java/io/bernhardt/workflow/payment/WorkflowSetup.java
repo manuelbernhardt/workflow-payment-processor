@@ -6,7 +6,6 @@ import io.bernhardt.workflow.payment.creditcard.CreditCardStorage;
 import io.bernhardt.workflow.payment.creditcard.IssuerBankClient;
 import io.bernhardt.workflow.payment.creditcard.IssuerCardId;
 import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingActivitiesImpl;
-import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingWorkflowImpl;
 import io.bernhardt.workflow.payment.creditcard.impl.MemoryCreditCardStorage;
 import io.bernhardt.workflow.payment.creditcard.impl.RandomLatencyIssuerBankClient;
 import io.bernhardt.workflow.payment.impl.MemoryConfigurationServiceImpl;
@@ -71,7 +70,7 @@ public class WorkflowSetup {
 
         // Worker that listens on a task queue and hosts both workflow and activity implementations.
         worker = factory.newWorker(TASK_QUEUE);
-        worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class, CreditCardProcessingWorkflowImpl.class);
+        worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl.class);
         worker.registerActivitiesImplementations(new PaymentHandlingActivitiesImpl(configurationService), new CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient));
 
         // Start listening to the workflow task queue.

@@ -5,7 +5,6 @@ import io.bernhardt.workflow.payment.creditcard.CreditCardDetails
 import io.bernhardt.workflow.payment.creditcard.IssuerBankClient
 import io.bernhardt.workflow.payment.creditcard.IssuerCardId
 import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingActivitiesImpl
-import io.bernhardt.workflow.payment.creditcard.impl.CreditCardProcessingWorkflowImpl
 import io.bernhardt.workflow.payment.creditcard.impl.MemoryCreditCardStorage
 import io.bernhardt.workflow.payment.creditcard.impl.RandomLatencyIssuerBankClient
 import io.bernhardt.workflow.payment.impl.MemoryConfigurationServiceImpl
@@ -61,7 +60,7 @@ fun main() {
     val worker = factory.newWorker(TASK_QUEUE)
 
     // register the workflow implementations
-    worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl::class.java, CreditCardProcessingWorkflowImpl::class.java)
+    worker.registerWorkflowImplementationTypes(PaymentHandlingWorkflowImpl::class.java)
 
     // register the activity implementations
     worker.registerActivitiesImplementations(PaymentHandlingActivitiesImpl(configurationService), CreditCardProcessingActivitiesImpl(creditCardStorage, issuerBankClient))
