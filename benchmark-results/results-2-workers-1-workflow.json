@@ -1,7 +1,7 @@
 [
     {
         "jmhVersion" : "1.28",
-        "benchmark" : "io.bernhardt.workflow.payment.PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime",
+        "benchmark" : "io.bernhardt.workflow.payment.PaymentHandlingWorkflowBenchmark.twoWorkersOneWorkflow",
         "mode" : "sample",
         "threads" : 1,
         "forks" : 1,
@@ -426,7 +426,7 @@
             ]
         },
         "secondaryMetrics" : {
-            "runWorkflowAvgExecutionTime·p0.00" : {
+            "twoWorkersOneWorkflow·p0.00" : {
                 "score" : 192.15155199999998,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -461,7 +461,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.50" : {
+            "twoWorkersOneWorkflow·p0.50" : {
                 "score" : 216.53094399999998,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -496,7 +496,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.90" : {
+            "twoWorkersOneWorkflow·p0.90" : {
                 "score" : 359.9761408,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -531,7 +531,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.95" : {
+            "twoWorkersOneWorkflow·p0.95" : {
                 "score" : 522.8199935999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -566,7 +566,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.99" : {
+            "twoWorkersOneWorkflow·p0.99" : {
                 "score" : 556.41636864,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -601,7 +601,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.999" : {
+            "twoWorkersOneWorkflow·p0.999" : {
                 "score" : 563.0853119999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -636,7 +636,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.9999" : {
+            "twoWorkersOneWorkflow·p0.9999" : {
                 "score" : 563.0853119999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -671,7 +671,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p1.00" : {
+            "twoWorkersOneWorkflow·p1.00" : {
                 "score" : 563.0853119999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [

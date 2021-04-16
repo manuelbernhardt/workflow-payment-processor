@@ -1,7 +1,7 @@
 [
     {
         "jmhVersion" : "1.28",
-        "benchmark" : "io.bernhardt.workflow.payment.PaymentHandlingWorkflowBenchmark.runWorkflowAvgExecutionTime",
+        "benchmark" : "io.bernhardt.workflow.payment.PaymentHandlingWorkflowBenchmark.oneWorkerTwoWorkflowsLocalActivities",
         "mode" : "sample",
         "threads" : 1,
         "forks" : 1,
@@ -753,7 +753,7 @@
             ]
         },
         "secondaryMetrics" : {
-            "runWorkflowAvgExecutionTime·p0.00" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.00" : {
                 "score" : 94.109696,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -788,7 +788,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.50" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.50" : {
                 "score" : 106.03724799999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -823,7 +823,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.90" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.90" : {
                 "score" : 117.2832256,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -858,7 +858,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.95" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.95" : {
                 "score" : 123.57468159999999,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -893,7 +893,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.99" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.99" : {
                 "score" : 170.32544255999974,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -928,7 +928,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.999" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.999" : {
                 "score" : 251.396096,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -963,7 +963,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p0.9999" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p0.9999" : {
                 "score" : 251.396096,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [
@@ -998,7 +998,7 @@
                     ]
                 ]
             },
-            "runWorkflowAvgExecutionTime·p1.00" : {
+            "oneWorkerTwoWorkflowsLocalActivities·p1.00" : {
                 "score" : 251.396096,
                 "scoreError" : "NaN",
                 "scoreConfidence" : [

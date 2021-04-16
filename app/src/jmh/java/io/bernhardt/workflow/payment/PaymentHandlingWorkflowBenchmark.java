@@ -20,7 +20,7 @@ public class PaymentHandlingWorkflowBenchmark {
     @Warmup(iterations = 1)
     @Measurement(iterations = 10, time = 10)
     @Fork(value = 1, warmups = 0)
-    public PaymentResult runWorkflowAvgExecutionTime(WorkflowSetup setup) {
+    public PaymentResult oneWorkerTwoWorkflows(WorkflowSetup setup) {
         PaymentHandlingWorkflow workflow = setup.client.newWorkflowStub(PaymentHandlingWorkflow.class, WorkflowOptions.newBuilder().setTaskQueue(Shared.COMMON_TASK_QUEUE).build());
         return workflow.handlePayment(new OrderId(UUID.randomUUID().toString()), setup.amountToSpend, setup.merchantId, setup.userId);
     }
